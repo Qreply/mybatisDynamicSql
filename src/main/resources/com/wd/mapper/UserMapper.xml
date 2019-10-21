@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--namespace必须是mapper的全限定类名-->
+<mapper namespace="com.wd.mapper.UserMapper">
+
+    <!-- 了解的内容：抽取重复的sql语句-->
+    <sql id="defaultUser">
+        select * from user
+    </sql>
+
+    <!--配置查询所有-->
+    <!--id属性的取值必须是mapper接口的方法名-->
+    <select id="findAll" resultType="user">
+        <include refid="defaultUser"></include>
+    </select>
+
+    <!--根据id查询用户信息-->
+    <select id="findById" parameterType="java.lang.Integer" resultType="com.wd.entity.User">
+        select * from user where id = #{id}
+    </select>
+
+    <!--根据名称模糊查询用户信息-->
+    <select id="findByName" parameterType="string" resultType="com.wd.entity.User">
+        select * from user where username like '%${username}%'
+    </select>
+
+    <!-- 根据queryVo的条件查询用户 -->
+    <select id="findUserByVo" parameterType="com.wd.entity.QueryVo" resultType="com.wd.entity.User">
+        select * from user where username like #{user.username}
+    </select>
+
+    <!--根据条件查询-->
+    <select id="findUserByCondition" resultType="user" parameterType="user">
+        select * from user
+        <where>
+            <if test="username != null">
+                and username = #{username}
+            </if>
+<!--            <if test="sex != null">-->
+<!--                and sex = #{sex}-->
+<!--            </if>-->
+        </where>
+    </select>
+
+    <!--根据queryvo中提供的id集合，查询用户信息-->
+    <select id="findUserInIds" resultType="user" parameterType="user">
+        <include refid="defaultUser"></include>
+        <where>
+            <if test="ids != null and ids.size() > 0">
+                <foreach collection="ids" open="and id in (" close=")" item="id" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+
+    </select>
+
+</mapper>
